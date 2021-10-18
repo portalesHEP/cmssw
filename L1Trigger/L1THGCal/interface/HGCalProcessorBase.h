@@ -23,6 +23,9 @@ typedef HGCalProcessorBaseT<edm::Handle<l1t::HGCalTriggerCellBxCollection>,
     HGCalConcentratorProcessorBase;
 typedef HGCalProcessorBaseT<edm::Handle<l1t::HGCalTriggerCellBxCollection>, l1t::HGCalClusterBxCollection>
     HGCalBackendLayer1ProcessorBase;
+typedef HGCalProcessorBaseT<std::pair<uint32_t, std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>,
+                            std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>
+    HGCalBackendLayer1ProcessorBase_1;
 typedef HGCalProcessorBaseT<edm::Handle<l1t::HGCalClusterBxCollection>,
                             std::pair<l1t::HGCalMulticlusterBxCollection, l1t::HGCalClusterBxCollection> >
     HGCalBackendLayer2ProcessorBase;
@@ -34,11 +37,12 @@ typedef HGCalProcessorBaseT<
     HGCalTowerProcessorBase;
 
 #include "FWCore/PluginManager/interface/PluginFactory.h"
-typedef edmplugin::PluginFactory<HGCalVFEProcessorBase*(const edm::ParameterSet&)> HGCalVFEProcessorBaseFactory;
-typedef edmplugin::PluginFactory<HGCalConcentratorProcessorBase*(const edm::ParameterSet&)> HGCalConcentratorFactory;
-typedef edmplugin::PluginFactory<HGCalBackendLayer1ProcessorBase*(const edm::ParameterSet&)> HGCalBackendLayer1Factory;
-typedef edmplugin::PluginFactory<HGCalBackendLayer2ProcessorBase*(const edm::ParameterSet&)> HGCalBackendLayer2Factory;
-typedef edmplugin::PluginFactory<HGCalTowerMapProcessorBase*(const edm::ParameterSet&)> HGCalTowerMapFactory;
-typedef edmplugin::PluginFactory<HGCalTowerProcessorBase*(const edm::ParameterSet&)> HGCalTowerFactory;
+typedef edmplugin::PluginFactory< HGCalVFEProcessorBase*            (const edm::ParameterSet&)> HGCalVFEProcessorBaseFactory;
+typedef edmplugin::PluginFactory< HGCalConcentratorProcessorBase*   (const edm::ParameterSet&)> HGCalConcentratorFactory;
+typedef edmplugin::PluginFactory< HGCalBackendLayer1ProcessorBase*  (const edm::ParameterSet&)> HGCalBackendLayer1Factory;
+typedef edmplugin::PluginFactory< HGCalBackendLayer1ProcessorBase_1*(const edm::ParameterSet&)> HGCalBackendLayer1Factory_1;
+typedef edmplugin::PluginFactory< HGCalBackendLayer2ProcessorBase*  (const edm::ParameterSet&)> HGCalBackendLayer2Factory;
+typedef edmplugin::PluginFactory< HGCalTowerMapProcessorBase*       (const edm::ParameterSet&)> HGCalTowerMapFactory;
+typedef edmplugin::PluginFactory< HGCalTowerProcessorBase*          (const edm::ParameterSet&)> HGCalTowerFactory;
 
 #endif

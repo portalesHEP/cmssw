@@ -9,16 +9,14 @@
 #include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationImpl.h"
 #include "L1Trigger/L1THGCal/interface/backend/HGCalClusteringDummyImpl.h"
 
-class HGCalBackendStage1Processor : public HGCalBackendLayer1ProcessorBase {
+class HGCalBackendStage1Processor : public HGCalBackendLayer1ProcessorBase_1 {
 public:
   HGCalBackendStage1Processor(const edm::ParameterSet& conf);
 
-  void run(const edm::Handle<l1t::HGCalTriggerCellBxCollection>& collHandle,
-           l1t::HGCalClusterBxCollection& collCluster2D,
-           const edm::EventSetup& es) override;
-
+  void run(const std::pair<uint32_t,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>& fpgaid,
+           std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& truncated_tcs,
+           const edm::EventSetup& es);
 private:
-  std::unique_ptr<HGCalClusteringDummyImpl> clusteringDummy_;
   std::unique_ptr<HGCalStage1TruncationImpl> truncation_;
 };
 
