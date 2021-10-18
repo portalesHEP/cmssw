@@ -9,7 +9,7 @@
 #include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationImpl.h"
 #include "L1Trigger/L1THGCal/interface/backend/HGCalClusteringDummyImpl.h"
 
-class HGCalBackendStage1Processor : public HGCalBackendLayer1ProcessorBase_1 {
+class HGCalBackendStage1Processor : public HGCalBackendStage1ProcessorBase {
 public:
   HGCalBackendStage1Processor(const edm::ParameterSet& conf);
 

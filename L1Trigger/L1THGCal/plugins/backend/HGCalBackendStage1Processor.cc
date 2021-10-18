@@ -1,9 +1,9 @@
 #include "L1Trigger/L1THGCal/interface/backend/HGCalBackendStage1Processor.h"
 
-DEFINE_EDM_PLUGIN(HGCalBackendLayer1Factory_1, HGCalBackendStage1Processor, "HGCalBackendStage1Processor");
+DEFINE_EDM_PLUGIN(HGCalBackendStage1Factory, HGCalBackendStage1Processor, "HGCalBackendStage1Processor");
 
 HGCalBackendStage1Processor::HGCalBackendStage1Processor(const edm::ParameterSet& conf)
-    : HGCalBackendLayer1ProcessorBase_1(conf) {
+    : HGCalBackendStage1ProcessorBase(conf) {
   truncation_ = std::make_unique<HGCalStage1TruncationImpl>(conf.getParameterSet("truncation_parameters"));
 }
 
