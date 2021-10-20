@@ -7,7 +7,7 @@ HGCalBackendStage1Processor::HGCalBackendStage1Processor(const edm::ParameterSet
   truncation_ = std::make_unique<HGCalStage1TruncationImpl>(conf.getParameterSet("truncation_parameters"));
 }
 
-void HGCalBackendStage1Processor::run(const std::pair<uint32_t,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>& fpgaid,
+void HGCalBackendStage1Processor::run(const std::pair<uint32_t,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>& fpga_id_tcs,
                                       std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& truncated_tcs,
                                       const edm::EventSetup& es) {
   if (truncation_)
