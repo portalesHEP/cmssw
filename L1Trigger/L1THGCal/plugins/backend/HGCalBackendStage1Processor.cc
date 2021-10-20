@@ -13,5 +13,5 @@ void HGCalBackendStage1Processor::run(const std::pair<uint32_t,std::vector<edm::
   if (truncation_)
     truncation_->eventSetup(es);
 
-  truncation_->run(fpgaid.first, fpgaid.second, truncated_tcs);
+  truncation_->run(fpga_id_tcs.first, fpga_id_tcs.second, truncated_tcs);
 }
