@@ -43,7 +43,7 @@ process.source = cms.Source("PoolSource",
            'drop BTLDetIdBTLSampleFTLDataFrameTsSorted_mix_FTLBarrel_HLT',
            'drop ETLDetIdETLSampleFTLDataFrameTsSorted_mix_FTLEndcap_HLT',
            )
-
+        )          
 process.options = cms.untracked.PSet(
 
 )
