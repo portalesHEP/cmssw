@@ -3,7 +3,9 @@ import FWCore.ParameterSet.Config as cms
 def custom_ntuples_layer1_truncation(process):
     ntuples = process.hgcalTriggerNtuplizer.Ntuples
     for ntuple in ntuples:
-        if ntuple.NtupleName=='HGCalTriggerNtupleHGCClusters':
+        if ntuple.NtupleName=='HGCalTriggerNtupleHGCClusters' or \
+           ntuple.NtupleName=='HGCalTriggerNtupleHGCTriggerCells' or \
+           ntuple.NtupleName=='HGCalTriggerNtupleHGCMulticlusters':
             ntuple.Clusters = cms.InputTag('hgcalBackEndLayer1Producer:HGCalBackendLayer1Processor')
     return process
 
