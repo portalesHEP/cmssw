@@ -43,7 +43,7 @@ process.source = cms.Source("PoolSource",
            'drop BTLDetIdBTLSampleFTLDataFrameTsSorted_mix_FTLBarrel_HLT',
            'drop ETLDetIdETLSampleFTLDataFrameTsSorted_mix_FTLEndcap_HLT',
            )
-        )          
+        )
 process.options = cms.untracked.PSet(
 
 )
@@ -66,18 +66,13 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic_T15', '')
 
 # load HGCAL TPG simulation
-process.load('L1Trigger.L1THGCal.hgcalTriggerPrimitivesNew_cff')
-#process.load('L1Trigger.L1THGCal.hgcalTriggerPrimitives_cff')
+process.load('L1Trigger.L1THGCal.hgcalTriggerPrimitives_cff')
 
 process.hgcl1tpg_step = cms.Path(process.hgcalTriggerPrimitives)
 
 
 # load ntuplizer
 process.load('L1Trigger.L1THGCalUtilities.hgcalTriggerNtuples_cff')
-from L1Trigger.L1THGCalUtilities.customNtuples import custom_ntuples_stage1_truncation
-from L1Trigger.L1THGCalUtilities.customNtuples import custom_ntuples_layer1_truncation
-#process = custom_ntuples_layer1_truncation(process)
-process = custom_ntuples_stage1_truncation(process)
 process.ntuple_step = cms.Path(process.hgcalTriggerNtuples)
 
 # Schedule definition

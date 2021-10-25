@@ -88,8 +88,7 @@ void HGCalBackendStage1Producer::produce(edm::Event& e, const edm::EventSetup& e
   std::vector<edm::Ptr<l1t::HGCalTriggerCell>> truncated_tcs;
 
   for (auto& fpga_tcs : tcs_per_fpga) {
-    std::pair<uint32_t,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>> fpga_id_tcs (fpga_tcs.first,fpga_tcs.second);
-    backendProcess_->run(fpga_id_tcs, truncated_tcs, es);
+    backendProcess_->run(fpga_tcs, truncated_tcs, es);
   }
 
   // Merge truncated tc collections
