@@ -19,6 +19,16 @@ def custom_ntuples_stage1_truncation(process):
             ntuple.Multiclusters = cms.InputTag('hgcalBackEndStage2Producer:HGCalBackendLayer2Processor3DClustering')
     return process
 
+def custom_ntuples_stage1_truncation_SA(process):
+    ntuples = process.hgcalTriggerNtuplizer.Ntuples
+    for ntuple in ntuples:
+        if ntuple.NtupleName=='HGCalTriggerNtupleHGCClusters' or \
+           ntuple.NtupleName=='HGCalTriggerNtupleHGCTriggerCells' or \
+           ntuple.NtupleName=='HGCalTriggerNtupleHGCMulticlusters':
+            ntuple.Clusters = cms.InputTag('hgcalBackEndStage1ProducerSA:HGCalBackendStage1ProcessorSA')
+            ntuple.Multiclusters = cms.InputTag('hgcalBackEndStage2SAtruncationProducer:HGCalBackendLayer2Processor3DClustering')
+    return process
+
 def custom_ntuples_standalone_clustering(process):
     ntuples = process.hgcalTriggerNtuplizer.Ntuples
     for ntuple in ntuples:

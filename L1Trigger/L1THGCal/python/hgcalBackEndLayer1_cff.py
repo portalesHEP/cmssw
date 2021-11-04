@@ -6,5 +6,6 @@ from L1Trigger.L1THGCal.hgcalBackEndLayer1Producer_cfi import *
 
 hgcalBackEndLayer1 = cms.Task(hgcalBackEndLayer1Producer)
 hgcalBackEndStage1 = cms.Task(hgcalBackEndStage1Producer)
+hgcalBackEndStage1SA = cms.Task(hgcalBackEndStage1ProducerSA)
 
 hgcalBackEndLayer1HFNose = cms.Task(hgcalBackEndLayer1ProducerHFNose)

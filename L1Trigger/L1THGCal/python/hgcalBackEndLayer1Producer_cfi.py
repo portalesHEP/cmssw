@@ -76,6 +76,15 @@ truncation_params = cms.PSet(rozMin=cms.double(0.07587128),
         doTruncation=cms.bool(True)
         )
 
+truncationSA_params = cms.PSet(AlgoName=cms.string('HGCalStage1TruncationWrapper'),
+        rozMin=cms.double(0.07587128),
+        rozMax=cms.double(0.55508006),
+        rozBins=cms.uint32(42),
+        maxTcsPerBin=cms.vuint32(ntcs_120links),
+        phiSectorEdges=cms.vdouble(phi_edges),
+        doTruncation=cms.bool(True)
+        )
+
 
 layer1truncation_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendLayer1Processor'),
                    C2d_parameters = dummy_C2d_params.clone(),
@@ -83,6 +92,9 @@ layer1truncation_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendLayer1
                    )
 stage1truncation_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendStage1Processor'),
                    truncation_parameters = truncation_params.clone()
+                   )
+stage1truncationSA_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendStage1ProcessorSA'),
+                   truncation_parameters = truncationSA_params.clone()
                    )
 
 be_proc = cms.PSet(ProcessorName  = cms.string('HGCalBackendLayer1Processor2DClustering'),
@@ -101,6 +113,13 @@ hgcalBackEndStage1Producer = cms.EDProducer(
     C2d_parameters = dummy_C2d_params.clone(),
     ProcessorParameters = stage1truncation_proc.clone()
     )
+hgcalBackEndStage1ProducerSA = cms.EDProducer(
+    "HGCalBackendStage1Producer",
+    InputTriggerCells = cms.InputTag('hgcalConcentratorProducer:HGCalConcentratorProcessorSelection'),
+    C2d_parameters = dummy_C2d_params.clone(),
+    ProcessorParameters = stage1truncationSA_proc.clone()
+    )
+
 
 hgcalBackEndLayer1ProducerHFNose = hgcalBackEndLayer1Producer.clone(
     InputTriggerCells = cms.InputTag('hgcalConcentratorProducerHFNose:HGCalConcentratorProcessorSelection')
