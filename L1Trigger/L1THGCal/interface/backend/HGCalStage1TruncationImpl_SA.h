@@ -14,8 +14,7 @@ public:
 
   void runAlgorithm() const;
 
-  l1thgcfirmware::HGCalTriggerCellSACollection run(std::pair<uint32_t,unsigned> fpga_id,
-                                                   const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
+  l1thgcfirmware::HGCalTriggerCellSACollection run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
                                                    const l1thgcfirmware::Stage1TruncationConfig theConf) const;
 
 private:

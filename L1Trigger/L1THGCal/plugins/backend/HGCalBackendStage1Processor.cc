@@ -19,15 +19,12 @@ void HGCalBackendStage1Processor::run(
   std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& truncated_tcs,
   const edm::EventSetup& es) {
 
+  const unsigned sector120 = HGCalTriggerBackendDetId(fpga_id_tcs.first).sector();
+  const uint32_t fpga_id = fpga_id_tcs.first;
+
   // Configuration
-  const std::pair<const edm::EventSetup&, const edm::ParameterSet&> configuration{es, conf_};
+  const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, unsigned, uint32_t> configuration{es, conf_, sector120, fpga_id};
   truncationWrapper_->configure(configuration);
 
-  unsigned sector120 = HGCalTriggerBackendDetId(fpga_id_tcs.first).sector();
-
-  std::pair<uint32_t,unsigned> id_sector(fpga_id_tcs.first,sector120);
-  const std::pair<std::pair<uint32_t,unsigned>,
-                  std::vector<edm::Ptr<l1t::HGCalTriggerCell>>> fpga_id_sector_tcs(id_sector,fpga_id_tcs.second);
-
-  truncationWrapper_->process(fpga_id_sector_tcs, truncated_tcs);
+  truncationWrapper_->process(fpga_id_tcs.second,truncated_tcs);
 }

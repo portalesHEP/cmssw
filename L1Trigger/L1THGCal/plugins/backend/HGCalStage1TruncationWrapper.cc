@@ -22,9 +22,9 @@ public:
   HGCalStage1TruncationWrapper(const edm::ParameterSet& conf);
   ~HGCalStage1TruncationWrapper() override {}
 
-  void configure(const std::pair<const edm::EventSetup&, const edm::ParameterSet&>& configuration) override;
+  void configure(const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>& configuration) override;
 
-  void process(const std::pair<std::pair<uint32_t,unsigned>,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>& fpga_id_tcs,
+  void process(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
                std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const override;
 
 private:
@@ -82,21 +82,25 @@ void HGCalStage1TruncationWrapper::convertAlgorithmOutputs(const l1thgcfirmware:
   }
 }
 
-void HGCalStage1TruncationWrapper::process(
-              const std::pair<std::pair<uint32_t,unsigned>,std::vector<edm::Ptr<l1t::HGCalTriggerCell>>>& fpga_id_tcs,
+void HGCalStage1TruncationWrapper::process(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
               std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const {
 
   l1thgcfirmware::HGCalTriggerCellSACollection fpga_tcs_SA;
-  convertCMSSWInputs(fpga_id_tcs.second, fpga_tcs_SA);
+  convertCMSSWInputs(fpga_tcs, fpga_tcs_SA);
 
-  l1thgcfirmware::HGCalTriggerCellSACollection tcs_out_SA = theAlgo_.run(fpga_id_tcs.first, fpga_tcs_SA, theConfiguration_);
+  l1thgcfirmware::HGCalTriggerCellSACollection tcs_out_SA = theAlgo_.run(fpga_tcs_SA, theConfiguration_);
 
-  convertAlgorithmOutputs(tcs_out_SA, fpga_id_tcs.second, tcs_out);
+  convertAlgorithmOutputs(tcs_out_SA, fpga_tcs, tcs_out);
 }
 
-void HGCalStage1TruncationWrapper::configure(const std::pair<const edm::EventSetup&,
-                                             const edm::ParameterSet&>& configuration) {
-  eventSetup(configuration.first);
+void HGCalStage1TruncationWrapper::configure(const std::tuple<const edm::EventSetup&,
+                                             const edm::ParameterSet&,
+                                             const unsigned&,
+                                             const uint32_t&>& configuration) {
+  eventSetup(std::get<0>(configuration));
+
+  theConfiguration_.setSector120(std::get<2>(configuration));
+  theConfiguration_.setFPGAID(std::get<3>(configuration));
 };
 
 DEFINE_EDM_PLUGIN(HGCalStage1TruncationWrapperBaseFactory,

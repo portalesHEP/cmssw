@@ -3,13 +3,13 @@
 
 HGCalStage1TruncationImplSA::HGCalStage1TruncationImplSA() {}
 
-l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(std::pair<uint32_t,unsigned> fpga_id,
+l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
          const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
          const l1thgcfirmware::Stage1TruncationConfig theConf) const{
 
  l1thgcfirmware::HGCalTriggerCellSACollection tcs_out;
 
-  unsigned sector120 = fpga_id.second;
+  unsigned sector120 = theConf.phiSector();
   std::unordered_map<unsigned, l1thgcfirmware::HGCalTriggerCellSACollection> tcs_per_bin;
 
   // configuation:
