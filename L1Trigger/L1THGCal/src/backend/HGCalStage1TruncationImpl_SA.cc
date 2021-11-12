@@ -3,12 +3,9 @@
 
 HGCalStage1TruncationImplSA::HGCalStage1TruncationImplSA() {}
 
-l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
-         const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-         const l1thgcfirmware::Stage1TruncationConfig theConf) const{
-
- l1thgcfirmware::HGCalTriggerCellSACollection tcs_out;
-
+unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
+                                          const l1thgcfirmware::Stage1TruncationConfig theConf,
+                                          l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const {
   unsigned sector120 = theConf.phiSector();
   std::unordered_map<unsigned, l1thgcfirmware::HGCalTriggerCellSACollection> tcs_per_bin;
 
@@ -17,8 +14,8 @@ l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
   double rozmin = theConf.rozMin();
   double rozmax = theConf.rozMax();
   unsigned rozbins = theConf.rozBins();
-  const std::vector<unsigned> maxtcsperbin = theConf.maxTcsPerBin();
-  const std::vector<double> phiedges = theConf.phiEdges();
+  const std::vector<unsigned>& maxtcsperbin = theConf.maxTcsPerBin();
+  const std::vector<double>& phiedges = theConf.phiEdges();
 
   constexpr double margin = 1.001;
   double roz_bin_size = (rozbins > 0 ? (rozmax - rozmin) * margin / double(rozbins) : 0.);
@@ -35,6 +32,8 @@ l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
     unsigned roverzbin = (roz_bin_size > 0. ? unsigned((roverz - rozmin) / roz_bin_size) : 0);
     double phi = rotatedphi(x, y, z, sector120);
     unsigned phibin = phiBin(roverzbin, phi, phiedges);
+    if (phibin > 1)
+      return 1;
     unsigned packed_bin = packBin(roverzbin, phibin);
 
     tcs_per_bin[packed_bin].push_back(tc);
@@ -51,7 +50,7 @@ l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
     unsigned phibin = 0;
     unpackBin(bin_tcs.first, roverzbin, phibin);
     if (roverzbin >= maxtcsperbin.size())
-      throw std::invalid_argument("HGCalStage1TruncationImplSA::OutOfRange");
+      return 1;
 
     unsigned max_tc = maxtcsperbin[roverzbin];
     if (do_truncate && bin_tcs.second.size() > max_tc) {
@@ -62,7 +61,8 @@ l1thgcfirmware::HGCalTriggerCellSACollection HGCalStage1TruncationImplSA::run(
       tcs_out.push_back(tc);
     }
   }
-  return tcs_out;
+
+  return 0;
 }
 
 unsigned HGCalStage1TruncationImplSA::packBin(unsigned roverzbin, unsigned phibin) const {
@@ -80,7 +80,7 @@ void HGCalStage1TruncationImplSA::unpackBin(unsigned packedbin, unsigned& roverz
 unsigned HGCalStage1TruncationImplSA::phiBin(unsigned roverzbin, double phi, std::vector<double> phiedges) const {
   unsigned phi_bin = 0;
   if (roverzbin >= phiedges.size())
-    throw std::invalid_argument("HGCalStage1TruncationImpl::OutOfRange");
+    return 2;
   double phi_edge = phiedges[roverzbin];
   if (phi > phi_edge)
     phi_bin = 1;

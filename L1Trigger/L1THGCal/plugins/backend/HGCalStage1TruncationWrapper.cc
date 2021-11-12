@@ -22,7 +22,8 @@ public:
   HGCalStage1TruncationWrapper(const edm::ParameterSet& conf);
   ~HGCalStage1TruncationWrapper() override {}
 
-  void configure(const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>& configuration) override;
+  void configure(const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>&
+                     configuration) override;
 
   void process(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
                std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const override;
@@ -52,13 +53,12 @@ HGCalStage1TruncationWrapper::HGCalStage1TruncationWrapper(const edm::ParameterS
                         conf.getParameter<std::vector<unsigned>>("maxTcsPerBin"),
                         conf.getParameter<std::vector<double>>("phiSectorEdges")) {}
 
-
 void HGCalStage1TruncationWrapper::convertCMSSWInputs(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
-                        l1thgcfirmware::HGCalTriggerCellSACollection& fpga_tcs_SA) const {
+                                                      l1thgcfirmware::HGCalTriggerCellSACollection& fpga_tcs_SA) const {
   fpga_tcs_SA.clear();
   fpga_tcs_SA.reserve(fpga_tcs.size());
   unsigned int itc = 0;
-  for (auto& tc: fpga_tcs) {
+  for (auto& tc : fpga_tcs) {
     fpga_tcs_SA.emplace_back(tc->position().x(),
                              tc->position().y(),
                              tc->position().z(),
@@ -73,30 +73,32 @@ void HGCalStage1TruncationWrapper::convertCMSSWInputs(const std::vector<edm::Ptr
   }
 }
 
-void HGCalStage1TruncationWrapper::convertAlgorithmOutputs(const l1thgcfirmware::HGCalTriggerCellSACollection& fpga_tcs_out,
-                                                           const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_original,
-                                                           std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_trunc) const {
-  for(unsigned itc = 0; itc < fpga_tcs_out.size(); ++itc){
+void HGCalStage1TruncationWrapper::convertAlgorithmOutputs(
+    const l1thgcfirmware::HGCalTriggerCellSACollection& fpga_tcs_out,
+    const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_original,
+    std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_trunc) const {
+  for (unsigned itc = 0; itc < fpga_tcs_out.size(); ++itc) {
     unsigned tc_cmssw_id = fpga_tcs_out[itc].index_cmssw();
     fpga_tcs_trunc.push_back(fpga_tcs_original[tc_cmssw_id]);
   }
 }
 
 void HGCalStage1TruncationWrapper::process(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
-              std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const {
-
+                                           std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const {
   l1thgcfirmware::HGCalTriggerCellSACollection fpga_tcs_SA;
   convertCMSSWInputs(fpga_tcs, fpga_tcs_SA);
 
-  l1thgcfirmware::HGCalTriggerCellSACollection tcs_out_SA = theAlgo_.run(fpga_tcs_SA, theConfiguration_);
+  l1thgcfirmware::HGCalTriggerCellSACollection tcs_out_SA;
+  unsigned ec = theAlgo_.run(fpga_tcs_SA, theConfiguration_, tcs_out_SA);
+
+  if (ec == 1)
+    throw cms::Exception("HGCalStage1TruncationImpl::OutOfRange") << "roverzbin index out of range";
 
   convertAlgorithmOutputs(tcs_out_SA, fpga_tcs, tcs_out);
 }
 
-void HGCalStage1TruncationWrapper::configure(const std::tuple<const edm::EventSetup&,
-                                             const edm::ParameterSet&,
-                                             const unsigned&,
-                                             const uint32_t&>& configuration) {
+void HGCalStage1TruncationWrapper::configure(
+    const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>& configuration) {
   eventSetup(std::get<0>(configuration));
 
   theConfiguration_.setSector120(std::get<2>(configuration));

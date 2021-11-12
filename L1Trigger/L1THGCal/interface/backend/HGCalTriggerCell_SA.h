@@ -7,19 +7,18 @@ namespace l1thgcfirmware {
 
   class HGCalTriggerCell {
   public:
-
     HGCalTriggerCell(){};
 
     HGCalTriggerCell(float x,
-                 float y,
-                 float z,
-                 int zside,
-                 unsigned int layer,
-                 float eta,
-                 float phi,
-                 float pt,
-                 float mipPt,
-                 unsigned int index_cmssw)
+                     float y,
+                     float z,
+                     int zside,
+                     unsigned int layer,
+                     float eta,
+                     float phi,
+                     float pt,
+                     float mipPt,
+                     unsigned int index_cmssw)
         : x_(x),
           y_(y),
           z_(z),

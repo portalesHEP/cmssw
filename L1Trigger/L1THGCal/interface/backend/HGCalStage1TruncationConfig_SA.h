@@ -2,17 +2,18 @@
 #define __L1Trigger_L1THGCal_HGCalStage1TruncationConfig_SA_h__
 
 #include <vector>
+#include <cstdint>  // uint32_t
 
 namespace l1thgcfirmware {
 
   class Stage1TruncationConfig {
   public:
     Stage1TruncationConfig(const bool do_truncate,
-                      const double roz_min,
-                      const double roz_max,
-                      const unsigned roz_bins,
-                      const std::vector<unsigned> max_tcs_per_bins,
-                      const std::vector<double> phi_edges)
+                           const double roz_min,
+                           const double roz_max,
+                           const unsigned roz_bins,
+                           const std::vector<unsigned> max_tcs_per_bins,
+                           const std::vector<double> phi_edges)
         : do_truncate_(do_truncate),
           roz_min_(roz_min),
           roz_max_(roz_max),
@@ -43,8 +44,8 @@ namespace l1thgcfirmware {
                     newConfig.phiEdges());
     }
 
-    void setSector120(const unsigned sector){ sector120_ = sector; }
-    void setFPGAID(const uint32_t fpga_id){ fpga_id_ = fpga_id; }
+    void setSector120(const unsigned sector) { sector120_ = sector; }
+    void setFPGAID(const uint32_t fpga_id) { fpga_id_ = fpga_id; }
 
     bool doTruncate() const { return do_truncate_; }
     double rozMin() const { return roz_min_; }
@@ -56,7 +57,6 @@ namespace l1thgcfirmware {
     uint32_t fpgaID() const { return fpga_id_; }
 
   private:
-
     bool do_truncate_;
     double roz_min_;
     double roz_max_;
@@ -65,7 +65,6 @@ namespace l1thgcfirmware {
     std::vector<double> phi_edges_;
     unsigned sector120_;
     uint32_t fpga_id_;
-
   };
 
 }  // namespace l1thgcfirmware
