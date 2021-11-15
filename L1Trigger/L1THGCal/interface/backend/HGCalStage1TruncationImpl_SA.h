@@ -17,7 +17,7 @@ public:
   void runAlgorithm() const;
 
   unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-               const l1thgcfirmware::Stage1TruncationConfig theConf,
+               const l1thgcfirmware::Stage1TruncationConfig& theConf,
                l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
 
 private:
@@ -34,7 +34,7 @@ private:
 
   uint32_t packBin(unsigned roverzbin, unsigned phibin) const;
   void unpackBin(unsigned packedbin, unsigned& roverzbin, unsigned& phibin) const;
-  unsigned phiBin(unsigned roverzbin, double phi, std::vector<double> phiedges) const;
+  int phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const;
   double rotatedphi(double x, double y, double z, int sector) const;
 };
 

@@ -4,7 +4,7 @@
 HGCalStage1TruncationImplSA::HGCalStage1TruncationImplSA() {}
 
 unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-                                          const l1thgcfirmware::Stage1TruncationConfig theConf,
+                                          const l1thgcfirmware::Stage1TruncationConfig& theConf,
                                           l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const {
   unsigned sector120 = theConf.phiSector();
   std::unordered_map<unsigned, l1thgcfirmware::HGCalTriggerCellSACollection> tcs_per_bin;
@@ -31,8 +31,8 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
 
     unsigned roverzbin = (roz_bin_size > 0. ? unsigned((roverz - rozmin) / roz_bin_size) : 0);
     double phi = rotatedphi(x, y, z, sector120);
-    unsigned phibin = phiBin(roverzbin, phi, phiedges);
-    if (phibin > 1)
+    int phibin = phiBin(roverzbin, phi, phiedges);
+    if (phibin < 0)
       return 1;
     unsigned packed_bin = packBin(roverzbin, phibin);
 
@@ -77,10 +77,10 @@ void HGCalStage1TruncationImplSA::unpackBin(unsigned packedbin, unsigned& roverz
   phibin = (packedbin & mask_phi_);
 }
 
-unsigned HGCalStage1TruncationImplSA::phiBin(unsigned roverzbin, double phi, std::vector<double> phiedges) const {
-  unsigned phi_bin = 0;
+int HGCalStage1TruncationImplSA::phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const {
+  int phi_bin = 0;
   if (roverzbin >= phiedges.size())
-    return 2;
+    return -1;
   double phi_edge = phiedges[roverzbin];
   if (phi > phi_edge)
     phi_bin = 1;

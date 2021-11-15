@@ -1,5 +1,3 @@
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-
 #include "L1Trigger/L1THGCal/interface/HGCalAlgoWrapperBase.h"
 
 #include "DataFormats/L1THGCal/interface/HGCalTriggerCell.h"
@@ -7,23 +5,14 @@
 #include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationImpl_SA.h"
 #include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationConfig_SA.h"
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-
-#include "L1Trigger/L1THGCal/interface/HGCalTriggerGeometryBase.h"
 #include "L1Trigger/L1THGCal/interface/HGCalTriggerTools.h"
-
-#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
-#include "DataFormats/L1Trigger/interface/L1Candidate.h"
-#include "DataFormats/L1Trigger/interface/BXVector.h"
-#include "DataFormats/DetId/interface/DetId.h"
 
 class HGCalStage1TruncationWrapper : public HGCalStage1TruncationWrapperBase {
 public:
   HGCalStage1TruncationWrapper(const edm::ParameterSet& conf);
   ~HGCalStage1TruncationWrapper() override {}
 
-  void configure(const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>&
-                     configuration) override;
+  void configure(const std::tuple<const edm::EventSetup&, const unsigned&, const uint32_t&>& configuration) override;
 
   void process(const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs,
                std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& tcs_out) const override;
@@ -77,8 +66,8 @@ void HGCalStage1TruncationWrapper::convertAlgorithmOutputs(
     const l1thgcfirmware::HGCalTriggerCellSACollection& fpga_tcs_out,
     const std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_original,
     std::vector<edm::Ptr<l1t::HGCalTriggerCell>>& fpga_tcs_trunc) const {
-  for (unsigned itc = 0; itc < fpga_tcs_out.size(); ++itc) {
-    unsigned tc_cmssw_id = fpga_tcs_out[itc].index_cmssw();
+  for (auto& tc : fpga_tcs_out) {
+    unsigned tc_cmssw_id = tc.index_cmssw();
     fpga_tcs_trunc.push_back(fpga_tcs_original[tc_cmssw_id]);
   }
 }
@@ -89,20 +78,20 @@ void HGCalStage1TruncationWrapper::process(const std::vector<edm::Ptr<l1t::HGCal
   convertCMSSWInputs(fpga_tcs, fpga_tcs_SA);
 
   l1thgcfirmware::HGCalTriggerCellSACollection tcs_out_SA;
-  unsigned ec = theAlgo_.run(fpga_tcs_SA, theConfiguration_, tcs_out_SA);
+  unsigned error_code = theAlgo_.run(fpga_tcs_SA, theConfiguration_, tcs_out_SA);
 
-  if (ec == 1)
+  if (error_code == 1)
     throw cms::Exception("HGCalStage1TruncationImpl::OutOfRange") << "roverzbin index out of range";
 
   convertAlgorithmOutputs(tcs_out_SA, fpga_tcs, tcs_out);
 }
 
 void HGCalStage1TruncationWrapper::configure(
-    const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, const unsigned&, const uint32_t&>& configuration) {
+    const std::tuple<const edm::EventSetup&, const unsigned&, const uint32_t&>& configuration) {
   eventSetup(std::get<0>(configuration));
 
-  theConfiguration_.setSector120(std::get<2>(configuration));
-  theConfiguration_.setFPGAID(std::get<3>(configuration));
+  theConfiguration_.setSector120(std::get<1>(configuration));
+  theConfiguration_.setFPGAID(std::get<2>(configuration));
 };
 
 DEFINE_EDM_PLUGIN(HGCalStage1TruncationWrapperBaseFactory,

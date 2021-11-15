@@ -20,8 +20,7 @@ void HGCalBackendStage1Processor::run(
   const uint32_t fpga_id = fpga_id_tcs.first;
 
   // Configuration
-  const std::tuple<const edm::EventSetup&, const edm::ParameterSet&, unsigned, uint32_t> configuration{
-      es, conf_, sector120, fpga_id};
+  const std::tuple<const edm::EventSetup&, unsigned, uint32_t> configuration{es, sector120, fpga_id};
   truncationWrapper_->configure(configuration);
 
   truncationWrapper_->process(fpga_id_tcs.second, truncated_tcs);

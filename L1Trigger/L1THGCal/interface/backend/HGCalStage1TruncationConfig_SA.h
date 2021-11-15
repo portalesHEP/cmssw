@@ -12,8 +12,8 @@ namespace l1thgcfirmware {
                            const double roz_min,
                            const double roz_max,
                            const unsigned roz_bins,
-                           const std::vector<unsigned> max_tcs_per_bins,
-                           const std::vector<double> phi_edges)
+                           const std::vector<unsigned>& max_tcs_per_bins,
+                           const std::vector<double>& phi_edges)
         : do_truncate_(do_truncate),
           roz_min_(roz_min),
           roz_max_(roz_max),
@@ -25,8 +25,8 @@ namespace l1thgcfirmware {
                        const double roz_min,
                        const double roz_max,
                        const unsigned roz_bins,
-                       const std::vector<unsigned> max_tcs_per_bins,
-                       const std::vector<double> phi_edges) {
+                       const std::vector<unsigned>& max_tcs_per_bins,
+                       const std::vector<double>& phi_edges) {
       do_truncate_ = do_truncate;
       roz_min_ = roz_min;
       roz_max_ = roz_max;
