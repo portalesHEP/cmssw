@@ -1,8 +1,9 @@
-#ifndef __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_h__
-#define __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_h__
+#ifndef __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
+#define __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
 
-#include "L1Trigger/L1THGCal/interface/backend/HGCalTriggerCell_SA.h"
-#include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationConfig_SA.h"
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalTriggerCell_SA.h"
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationConfig_SA.h"
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1SortingAlg_SA.h"
 
 #include <vector>
 #include <cstdint>        // uint32_t, unsigned
@@ -36,6 +37,10 @@ private:
   void unpackBin(unsigned packedbin, unsigned& roverzbin, unsigned& phibin) const;
   int phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const;
   double rotatedphi(double x, double y, double z, int sector) const;
+  double rotatedphi(double phi, int sector) const;
+
+  unsigned smallerMultOfFourGreaterThan(unsigned n) const;
+
 };
 
 #endif
