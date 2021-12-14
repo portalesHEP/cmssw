@@ -2,9 +2,11 @@
 #include <cmath>
 #include <iostream>
 
-HGCalStage1TruncationImplSA::HGCalStage1TruncationImplSA() {}
+using namespace l1thgcfirmware;
 
-unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
+HGCalStage1TruncationImplEmulator::HGCalStage1TruncationImplEmulator() {}
+
+unsigned HGCalStage1TruncationImplEmulator::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
                                           const l1thgcfirmware::Stage1TruncationConfig& theConf,
                                           l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const {
   unsigned sector120 = theConf.phiSector();
@@ -32,7 +34,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
     int phibin = phiBin(roverzbin, phi, phiedges);
     if (phibin < 0)
       return 1;
-    unsigned packed_bin = packBin(roverzbin, phibin);
+    uint32_t packed_bin = packBin(roverzbin, phibin);
 
     tcs_per_bin[packed_bin].push_back(tc);
   }
@@ -72,7 +74,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
   for (auto& bin_tcs : tcs_per_bin) {
 
     unsigned roverzbin = 0;
-    unsigned phibin = 0;
+    int phibin = 0;
     unpackBin(bin_tcs.first, roverzbin, phibin);
 
 //    const unsigned ntcin = smallerMultOfFourGreaterThan(bin_tcs.second.at(0).ntc());
@@ -84,7 +86,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
     std::vector<unsigned> theTCsIn_mipt(ntcin);
     std::vector<unsigned> theTCsOut_mipt(ntcout);
     std::vector<unsigned> theTCsOut_addr(ntcout);
-    for (int i=0; i<ntcin; ++i) {
+    for (unsigned i=0; i<ntcin; ++i) {
       if(i<bin_tcs.second.size())
         theTCsIn_mipt[i] = bin_tcs.second.at(i).energy();
       else
@@ -92,7 +94,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
     }
     tcSorter.sorting(theTCsIn_mipt, theTCsOut_mipt, theTCsOut_addr);
 
-    for (const int& tcid : theTCsOut_addr) {
+    for (const unsigned& tcid : theTCsOut_addr) {
       if(tcid<bin_tcs.second.size())
         tcs_out.push_back(bin_tcs.second.at(tcid));
     }
@@ -101,20 +103,20 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
   return 0;
 }
 
-unsigned HGCalStage1TruncationImplSA::packBin(unsigned roverzbin, unsigned phibin) const {
+uint32_t HGCalStage1TruncationImplEmulator::packBin(unsigned roverzbin, int phibin) const {
   unsigned packed_bin = 0;
   packed_bin |= ((roverzbin & mask_roz_) << offset_roz_);
   packed_bin |= (phibin & mask_phi_);
   return packed_bin;
 }
 
-void HGCalStage1TruncationImplSA::unpackBin(unsigned packedbin, unsigned& roverzbin, unsigned& phibin) const {
+void HGCalStage1TruncationImplEmulator::unpackBin(unsigned packedbin, unsigned& roverzbin, int& phibin) const {
   roverzbin = ((packedbin >> offset_roz_) & mask_roz_);
   phibin = (packedbin & mask_phi_);
 }
 
-int HGCalStage1TruncationImplSA::phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const {
-  int phi_bin = 0;
+int HGCalStage1TruncationImplEmulator::phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const {
+  unsigned phi_bin = 0;
   if (roverzbin >= phiedges.size())
     return -1;
   double phi_edge = phiedges[roverzbin];
@@ -123,7 +125,7 @@ int HGCalStage1TruncationImplSA::phiBin(unsigned roverzbin, double phi, const st
   return phi_bin;
 }
 
-double HGCalStage1TruncationImplSA::rotatedphi(double x, double y, double z, int sector) const {
+double HGCalStage1TruncationImplEmulator::rotatedphi(double x, double y, double z, unsigned sector) const {
   if (z > 0)
     x = -x;
   double phi = std::atan2(y, x);
@@ -139,7 +141,7 @@ double HGCalStage1TruncationImplSA::rotatedphi(double x, double y, double z, int
   return phi;
 }
 
-double HGCalStage1TruncationImplSA::rotatedphi(double phi, int sector) const {
+double HGCalStage1TruncationImplEmulator::rotatedphi(double phi, unsigned sector) const {
   if (sector == 1) {
     if (phi < M_PI and phi > 0)
       phi = phi - (2. * M_PI / 3.);
@@ -151,8 +153,8 @@ double HGCalStage1TruncationImplSA::rotatedphi(double phi, int sector) const {
   return phi;
 }
 
-  unsigned HGCalStage1TruncationImplSA::smallerMultOfFourGreaterThan(unsigned N) const {
-    int remnant = (N+4)%4;
+  unsigned HGCalStage1TruncationImplEmulator::smallerMultOfFourGreaterThan(unsigned N) const {
+    unsigned remnant = (N+4)%4;
     if (remnant==0)
       return N;
     else

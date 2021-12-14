@@ -26,22 +26,20 @@ namespace l1thgcfirmware {
 
   class HGCalStage1SortingAlg_SA {
   public:
+
     HGCalStage1SortingAlg_SA();
 
-    HGCalStage1SortingAlg_SA(const unsigned NTCin,
-                  const unsigned NTCout)
-        : N(NTCin),
-          NS(0),
-          NMA(0),
-          NMB(0),
-          M(NTCout) {
-            unsigned ns = NTCin/4;
-            unsigned nma = (NTCout<(NTCin/4)) ? 2*NTCout : NTCin/2;
-            unsigned nmb = (NTCout<nma) ? 2*NTCout : 2*nma;
-            setNS(ns);
-            setNMA(nma);
-            setNMB(nmb);
-          }
+  HGCalStage1SortingAlg_SA(const unsigned NTCin,
+			   const unsigned NTCout)
+    : N(NTCin),
+      M(NTCout) {
+	unsigned ns = NTCin/4;
+	unsigned nma = (NTCout<(NTCin/4)) ? 2*NTCout : NTCin/2;
+	unsigned nmb = (NTCout<nma) ? 2*NTCout : 2*nma;
+	setNS(ns);
+	setNMA(nma);
+	setNMB(nmb);
+      }
 
     ~HGCalStage1SortingAlg_SA(){}
 
@@ -60,10 +58,10 @@ namespace l1thgcfirmware {
     //Merger algorithm B
     void mergerB(data_to_merge_t& list_merger, adress_t& list_adresses) const;
     //Calculate base 2 logarithm , and round to next integer
-    int loop_bound_for_mergera(void) const;
-    int loop_bound_for_mergerb(void) const;
-    int loop_bound_for_sorter(void) const;
-    int log2_rounded (int i) const;
+    unsigned loop_bound_for_mergera(void) const;
+    unsigned loop_bound_for_mergerb(void) const;
+    unsigned loop_bound_for_sorter(void) const;
+    unsigned log2_rounded (unsigned i) const;
 
     const unsigned N; // number of total elements to sort
     const unsigned M; // number of elements to select

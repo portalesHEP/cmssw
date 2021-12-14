@@ -1,5 +1,5 @@
-#ifndef __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
-#define __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
+#ifndef __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_Emulator_h__
+#define __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_Emulator_h__
 
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalTriggerCell_SA.h"
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationConfig_SA.h"
@@ -10,37 +10,41 @@
 #include <unordered_map>  // std::unordered_map
 #include <algorithm>      // std::sort
 
-class HGCalStage1TruncationImplSA {
-public:
-  HGCalStage1TruncationImplSA();
-  ~HGCalStage1TruncationImplSA() {}
+namespace l1thgcfirmware {
 
-  void runAlgorithm() const;
+  class HGCalStage1TruncationImplEmulator {
+  public:
+    HGCalStage1TruncationImplEmulator();
+    ~HGCalStage1TruncationImplEmulator() {}
 
-  unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-               const l1thgcfirmware::Stage1TruncationConfig& theConf,
-               l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
+    void runAlgorithm() const;
 
-private:
-  static constexpr unsigned offset_roz_ = 1;
-  static constexpr unsigned mask_roz_ = 0x3f;  // 6 bits, max 64 bins
-  static constexpr unsigned mask_phi_ = 1;
+    unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
+		 const l1thgcfirmware::Stage1TruncationConfig& theConf,
+		 l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
 
-  bool do_truncate_;
-  double roz_min_ = 0.;
-  double roz_max_ = 0.;
-  unsigned roz_bins_ = 42;
-  std::vector<unsigned> max_tcs_per_bin_;
-  std::vector<double> phi_edges_;
+  private:
+    static constexpr unsigned offset_roz_ = 1;
+    static constexpr unsigned mask_roz_ = 0x3f;  // 6 bits, max 64 bins
+    static constexpr unsigned mask_phi_ = 1;
 
-  uint32_t packBin(unsigned roverzbin, unsigned phibin) const;
-  void unpackBin(unsigned packedbin, unsigned& roverzbin, unsigned& phibin) const;
-  int phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const;
-  double rotatedphi(double x, double y, double z, int sector) const;
-  double rotatedphi(double phi, int sector) const;
+    bool do_truncate_;
+    double roz_min_ = 0.;
+    double roz_max_ = 0.;
+    unsigned roz_bins_ = 42;
+    std::vector<unsigned> max_tcs_per_bin_;
+    std::vector<double> phi_edges_;
 
-  unsigned smallerMultOfFourGreaterThan(unsigned n) const;
+    uint32_t packBin(unsigned roverzbin, int phibin) const;
+    void unpackBin(unsigned packedbin, unsigned& roverzbin, int& phibin) const;
+    int phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const;
+    double rotatedphi(double x, double y, double z, unsigned sector) const;
+    double rotatedphi(double phi, unsigned sector) const;
 
-};
+    unsigned smallerMultOfFourGreaterThan(unsigned n) const;
+
+  };
+
+} // lithgcfirmware
 
 #endif

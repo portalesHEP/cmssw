@@ -23,92 +23,92 @@ using namespace l1thgcfirmware;
 //-------------------------------------------------------------------------------------------------/
 void HGCalStage1SortingAlg_SA::sorting(datain_t& arr_input, dataout_t& arr_output, adressout_t& arr_adresses) const {
 
-	//Variables declaration
-	datasorter_t arr_tmp(NS);
-	datamergera_t arr_tmp_so(NMA), arr_tmp_so1(NMA), arr_tmp_so2(NMA);
-	datamergerb_t arr_tmp_mo(NMB);
-	adresssorter_t arr_tmp_adresses(NS);
-	adressmergera_t arr_tmp_so_adresses(NMA), arr_tmp_so1_adresses(NMA), arr_tmp_so2_adresses(NMA);
-	adressmergerb_t arr_tmp_mo_adresses(NMB);
+  //Variables declaration
+  datasorter_t arr_tmp(NS);
+  datamergera_t arr_tmp_so(NMA), arr_tmp_so1(NMA), arr_tmp_so2(NMA);
+  datamergerb_t arr_tmp_mo(NMB);
+  adresssorter_t arr_tmp_adresses(NS);
+  adressmergera_t arr_tmp_so_adresses(NMA), arr_tmp_so1_adresses(NMA), arr_tmp_so2_adresses(NMA);
+  adressmergerb_t arr_tmp_mo_adresses(NMB);
 
-	int cs; //counter for sorter blocks
-	int cm; //counter for merger blocks
-	int i;	//Index for loops
+  unsigned cs; //counter for sorter blocks
+  unsigned cm; //counter for merger blocks
+  unsigned i;	//Index for loops
 
-	//Generate four "sorter blocks" of NS inputs each-----------------------------------------------
+  //Generate four "sorter blocks" of NS inputs each-----------------------------------------------
   for (cs=0; cs<4; cs++) {
-		//Replica of entry array. Important for a correct HW synthesis
-		//It builds a list of NS elements
+    //Replica of entry array. Important for a correct HW synthesis
+    //It builds a list of NS elements
     for (i = 0; i < NS; i++) {
-			arr_tmp[i]=arr_input[i+cs*NS];
-			arr_tmp_adresses[i]=i+cs*NS;
-		}
+      arr_tmp[i]=arr_input[i+cs*NS];
+      arr_tmp_adresses[i]=i+cs*NS;
+    }
 
-		//Call to function that sorts NS inputs
-		sorter(arr_tmp, arr_tmp_adresses);
+    //Call to function that sorts NS inputs
+    sorter(arr_tmp, arr_tmp_adresses);
 
-		//Arrange 4 sorted lists in 2 arrays of NMA elements each
-		if (cs==0 || cs==1) {
+    //Arrange 4 sorted lists in 2 arrays of NMA elements each
+    if (cs==0 || cs==1) {
       for (i = 0; i < NMA/2; i++) {
-				arr_tmp_so1[i*2+cs]=arr_tmp[i];
-				arr_tmp_so1_adresses[i*2+cs]=arr_tmp_adresses[i];
-			}
-		} else if (cs==2 || cs==3) {
-			for (i = 0; i < NMA/2; i++) {
-				arr_tmp_so2[(i-1)*2+cs]=arr_tmp[i];
-				arr_tmp_so2_adresses[(i-1)*2+cs]=arr_tmp_adresses[i];
-			}
-		}
+	arr_tmp_so1[i*2+cs]=arr_tmp[i];
+	arr_tmp_so1_adresses[i*2+cs]=arr_tmp_adresses[i];
+      }
+    } else if (cs==2 || cs==3) {
+      for (i = 0; i < NMA/2; i++) {
+	arr_tmp_so2[(i-1)*2+cs]=arr_tmp[i];
+	arr_tmp_so2_adresses[(i-1)*2+cs]=arr_tmp_adresses[i];
+      }
+    }
 
-	}//End of block sorter---------------------------------------------------------------------------
+  }//End of block sorter---------------------------------------------------------------------------
 
 
-	//Generate two "merger blocks" of NMA inputs each-------------------------------------------------
-	for (cm=0; cm<2; cm++) {
+  //Generate two "merger blocks" of NMA inputs each-------------------------------------------------
+  for (cm=0; cm<2; cm++) {
 
-		//It builds a list of NMA inputs
-		if (cm==0) {
-			for (i = 0; i < NMA; i++) {
-				arr_tmp_so[i]=arr_tmp_so1[i];
-				arr_tmp_so_adresses[i]=arr_tmp_so1_adresses[i];
-			}
-		} else if(cm==1) {
-			for (i = 0; i < NMA; i++) {
-				arr_tmp_so[i]=arr_tmp_so2[i];
-				arr_tmp_so_adresses[i]=arr_tmp_so2_adresses[i];
-			}
-		}
+    //It builds a list of NMA inputs
+    if (cm==0) {
+      for (i = 0; i < NMA; i++) {
+	arr_tmp_so[i]=arr_tmp_so1[i];
+	arr_tmp_so_adresses[i]=arr_tmp_so1_adresses[i];
+      }
+    } else if(cm==1) {
+      for (i = 0; i < NMA; i++) {
+	arr_tmp_so[i]=arr_tmp_so2[i];
+	arr_tmp_so_adresses[i]=arr_tmp_so2_adresses[i];
+      }
+    }
 
-		//Call to function that merges NMA inputs
-		mergerA(arr_tmp_so, arr_tmp_so_adresses);
+    //Call to function that merges NMA inputs
+    mergerA(arr_tmp_so, arr_tmp_so_adresses);
 
-		//Arrange 2 sorted lists in 1 array of NMB elements
-		if (cm==0) {
+    //Arrange 2 sorted lists in 1 array of NMB elements
+    if (cm==0) {
       for (i = 0; i < NMB/2; i++) {
-				arr_tmp_mo[i*2]=arr_tmp_so[i];
-				arr_tmp_mo_adresses[i*2]=arr_tmp_so_adresses[i];
-			}
-		} else if(cm==1) {
-			for (i = 0; i < NMB/2; i++) {
-				arr_tmp_mo[i*2+1]=arr_tmp_so[i];
-				arr_tmp_mo_adresses[i*2+1]=arr_tmp_so_adresses[i];
-			}
-		}
+	arr_tmp_mo[i*2]=arr_tmp_so[i];
+	arr_tmp_mo_adresses[i*2]=arr_tmp_so_adresses[i];
+      }
+    } else if(cm==1) {
+      for (i = 0; i < NMB/2; i++) {
+	arr_tmp_mo[i*2+1]=arr_tmp_so[i];
+	arr_tmp_mo_adresses[i*2+1]=arr_tmp_so_adresses[i];
+      }
+    }
 
-	}//End of block for merging-------------------------------------------------------------------
+  }//End of block for merging-------------------------------------------------------------------
 
 
 
-	//Generates 1 "merger block" of NMB inputs ----------------------------------------------------
-	//Call to function to merge
+  //Generates 1 "merger block" of NMB inputs ----------------------------------------------------
+  //Call to function to merge
   mergerB(arr_tmp_mo, arr_tmp_mo_adresses);
 
 
-	//Replica of output array. Important for a correct HW synthesis
-	for (i = 0; i < M; i++) {
-		arr_output[i]=arr_tmp_mo[i];
-		arr_adresses[i]=arr_tmp_mo_adresses[i];
-	}
+  //Replica of output array. Important for a correct HW synthesis
+  for (i = 0; i < M; i++) {
+    arr_output[i]=arr_tmp_mo[i];
+    arr_adresses[i]=arr_tmp_mo_adresses[i];
+  }
 
 }
 
@@ -122,56 +122,56 @@ void HGCalStage1SortingAlg_SA::sorting(datain_t& arr_input, dataout_t& arr_outpu
 
 void HGCalStage1SortingAlg_SA::sorter(data_to_sort_t& list_sorter,  adress_t& list_adresses) const {
 
-	int tmp_data, tmp_adress;
-	int i, p, q, r, d, constant_bound;
-	datasorter_t list_sorter_tmp(NS);
-	adresssorter_t list_adresses_tmp(NS);
+  unsigned tmp_data, tmp_adress;
+  unsigned i, p, q, r, d, constant_bound;
+  datasorter_t list_sorter_tmp(NS);
+  adresssorter_t list_adresses_tmp(NS);
 
-	//Replica of entry array. Important for a correct HW synthesis
-	for (i = 0; i < NS; i++) {
-		list_sorter_tmp[i]=list_sorter[i];
-		list_adresses_tmp[i]=list_adresses[i];
+  //Replica of entry array. Important for a correct HW synthesis
+  for (i = 0; i < NS; i++) {
+    list_sorter_tmp[i]=list_sorter[i];
+    list_adresses_tmp[i]=list_adresses[i];
+  }
+
+  //Calculate bound for loop, which is 2^[log2(NS)]
+  constant_bound=loop_bound_for_sorter();
+
+  //Performed for p=2^(n-1), 2^(n-2), ... , 1
+  for (p=constant_bound,q=constant_bound,r=0,d=p  ;  p>=1  ;  p=p/2,q=constant_bound,r=0,d=p ) {
+
+    //Performed for q=2^(n-1), 2^(n-2), ... , p
+    for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
+      //counter_levels++;
+
+      //Parcour the list_sorter of elements to do exchanges
+      for (i=0  ;  i<(NS-d)  ;  i++ ) {
+
+	if ((i & p)==r) {
+	  //counter_comparators++;
+
+	  //Compare & Exchange
+	  if (list_sorter_tmp[i]<list_sorter_tmp[i+d]) {
+
+	    tmp_data=list_sorter_tmp[i];
+	    list_sorter_tmp[i]=list_sorter_tmp[i+d];
+	    list_sorter_tmp[i+d]=tmp_data;
+
+	    tmp_adress=list_adresses_tmp[i];
+	    list_adresses_tmp[i]=list_adresses_tmp[i+d];
+	    list_adresses_tmp[i+d]=tmp_adress;
+	  }
+
 	}
 
-	//Calculate bound for loop, which is 2^[log2(NS)]
-	constant_bound=loop_bound_for_sorter();
+      }//Label2
+    }//Label1
+  }//Label0
 
-	//Performed for p=2^(n-1), 2^(n-2), ... , 1
-	for (p=constant_bound,q=constant_bound,r=0,d=p  ;  p>=1  ;  p=p/2,q=constant_bound,r=0,d=p ) {
-
-		//Performed for q=2^(n-1), 2^(n-2), ... , p
-		for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
-			//counter_levels++;
-
-			//Parcour the list_sorter of elements to do exchanges
-			for (i=0  ;  i<(NS-d)  ;  i++ ) {
-
-				if ((i & p)==r) {
-					//counter_comparators++;
-
-					//Compare & Exchange
-					if (list_sorter_tmp[i]<list_sorter_tmp[i+d]) {
-
-						tmp_data=list_sorter_tmp[i];
-						list_sorter_tmp[i]=list_sorter_tmp[i+d];
-						list_sorter_tmp[i+d]=tmp_data;
-
-						tmp_adress=list_adresses_tmp[i];
-						list_adresses_tmp[i]=list_adresses_tmp[i+d];
-						list_adresses_tmp[i+d]=tmp_adress;
-					}
-
-				}
-
-			}//Label2
-		}//Label1
-	}//Label0
-
-	//Replica of output array. Important for correct HW synthesis
-	for (i = 0; i < NS; i++) {
-		list_sorter[i]=list_sorter_tmp[i];
-		list_adresses[i]=list_adresses_tmp[i];
-	}
+  //Replica of output array. Important for correct HW synthesis
+  for (i = 0; i < NS; i++) {
+    list_sorter[i]=list_sorter_tmp[i];
+    list_adresses[i]=list_adresses_tmp[i];
+  }
 
 }
 
@@ -184,55 +184,55 @@ void HGCalStage1SortingAlg_SA::sorter(data_to_sort_t& list_sorter,  adress_t& li
 //-------------------------------------------------------------------------------------------------/
 void HGCalStage1SortingAlg_SA::mergerA(data_to_merge_t& list_merger, adress_t& list_adresses) const {
 
-	int tmp, tmp_adress;
-	int i, p, q, r, d;
-	datamergera_t list_merger_tmp(NMA);
-	adressmergera_t list_adresses_tmp(NMA);
+  unsigned tmp, tmp_adress;
+  unsigned i, p, q, r, d;
+  datamergera_t list_merger_tmp(NMA);
+  adressmergera_t list_adresses_tmp(NMA);
 
-	//Replica of entry array. Important for correct HW synthesis
-	for (i = 0; i < NMA; i++) {
-		list_merger_tmp[i]=list_merger[i];
-		list_adresses_tmp[i]=list_adresses[i];
+  //Replica of entry array. Important for correct HW synthesis
+  for (i = 0; i < NMA; i++) {
+    list_merger_tmp[i]=list_merger[i];
+    list_adresses_tmp[i]=list_adresses[i];
+  }
+
+  //Variables initialization for nested loops
+  p=1;
+  q=loop_bound_for_mergera();
+  r=0;
+  d=p;
+
+  //Performed for q=2^(n-1), 2^(n-2), ... , p
+  for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
+    //counter_levels++;
+
+    //Parcour the list_sorter of elements to do exchanges
+    for (i=0  ;  i<(NMA-d)  ;  i++ ) {
+
+      if ((i & p)==r) {
+	//counter_comparators++;
+
+	//Compare & Exchange
+	if (list_merger_tmp[i]<list_merger_tmp[i+d]) {
+	  tmp=list_merger_tmp[i];
+	  list_merger_tmp[i]=list_merger_tmp[i+d];
+	  list_merger_tmp[i+d]=tmp;
+
+	  tmp_adress=list_adresses_tmp[i];
+	  list_adresses_tmp[i]=list_adresses_tmp[i+d];
+	  list_adresses_tmp[i+d]=tmp_adress;
 	}
 
-	//Variables initialization for nested loops
-	p=1;
-	q=loop_bound_for_mergera();
-	r=0;
-	d=p;
+      }
 
-	//Performed for q=2^(n-1), 2^(n-2), ... , p
-	for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
-		//counter_levels++;
-
-		//Parcour the list_sorter of elements to do exchanges
-		for (i=0  ;  i<(NMA-d)  ;  i++ ) {
-
-			if ((i & p)==r) {
-				//counter_comparators++;
-
-				//Compare & Exchange
-				if (list_merger_tmp[i]<list_merger_tmp[i+d]) {
-					tmp=list_merger_tmp[i];
-					list_merger_tmp[i]=list_merger_tmp[i+d];
-					list_merger_tmp[i+d]=tmp;
-
-					tmp_adress=list_adresses_tmp[i];
-					list_adresses_tmp[i]=list_adresses_tmp[i+d];
-					list_adresses_tmp[i+d]=tmp_adress;
-				}
-
-			}
-
-		}//Label2
-	}//Label1
+    }//Label2
+  }//Label1
 
 
-	//Replica of output array. Important for correct HW synthesis
-	for (i = 0; i < NMA; i++) {
-		list_merger[i]=list_merger_tmp[i];
-		list_adresses[i]=list_adresses_tmp[i];
-	}
+  //Replica of output array. Important for correct HW synthesis
+  for (i = 0; i < NMA; i++) {
+    list_merger[i]=list_merger_tmp[i];
+    list_adresses[i]=list_adresses_tmp[i];
+  }
 
 }
 
@@ -245,55 +245,55 @@ void HGCalStage1SortingAlg_SA::mergerA(data_to_merge_t& list_merger, adress_t& l
 //-------------------------------------------------------------------------------------------------/
 void HGCalStage1SortingAlg_SA::mergerB(data_to_merge_t& list_merger, adress_t& list_adresses) const {
 
-	int tmp, tmp_adress;
-	int i, p, q, r, d;
-	datamergerb_t list_merger_tmp(NMB);
-	adressmergerb_t list_adresses_tmp(NMB);
+  unsigned tmp, tmp_adress;
+  unsigned i, p, q, r, d;
+  datamergerb_t list_merger_tmp(NMB);
+  adressmergerb_t list_adresses_tmp(NMB);
 
-	//Replica of entry array. Important for correct HW synthesis
-	for (i = 0; i < NMB; i++) {
-		list_merger_tmp[i]=list_merger[i];
-		list_adresses_tmp[i]=list_adresses[i];
+  //Replica of entry array. Important for correct HW synthesis
+  for (i = 0; i < NMB; i++) {
+    list_merger_tmp[i]=list_merger[i];
+    list_adresses_tmp[i]=list_adresses[i];
+  }
+
+  //Variables initialization for nested loops
+  p=1;
+  q=loop_bound_for_mergerb();
+  r=0;
+  d=p;
+
+  //Performed for q=2^(n-1), 2^(n-2), ... , p
+  for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
+    //counter_levels++;
+
+    //Parcour the list_sorter of elements to do exchanges
+    for (i=0  ;  i<(NMB-d)  ;  i++ ) {
+
+      if ((i & p)==r) {
+	//counter_comparators++;
+
+	//Compare & Exchange
+	if (list_merger_tmp[i]<list_merger_tmp[i+d]) {
+	  tmp=list_merger_tmp[i];
+	  list_merger_tmp[i]=list_merger_tmp[i+d];
+	  list_merger_tmp[i+d]=tmp;
+
+	  tmp_adress=list_adresses_tmp[i];
+	  list_adresses_tmp[i]=list_adresses_tmp[i+d];
+	  list_adresses_tmp[i+d]=tmp_adress;
 	}
 
-	//Variables initialization for nested loops
-	p=1;
-	q=loop_bound_for_mergerb();
-	r=0;
-	d=p;
+      }
 
-	//Performed for q=2^(n-1), 2^(n-2), ... , p
-	for (;  q>=p  ;  d=q-p,r=p,q=q/2) {
-		//counter_levels++;
-
-		//Parcour the list_sorter of elements to do exchanges
-		for (i=0  ;  i<(NMB-d)  ;  i++ ) {
-
-			if ((i & p)==r) {
-				//counter_comparators++;
-
-				//Compare & Exchange
-				if (list_merger_tmp[i]<list_merger_tmp[i+d]) {
-					tmp=list_merger_tmp[i];
-					list_merger_tmp[i]=list_merger_tmp[i+d];
-					list_merger_tmp[i+d]=tmp;
-
-					tmp_adress=list_adresses_tmp[i];
-					list_adresses_tmp[i]=list_adresses_tmp[i+d];
-					list_adresses_tmp[i+d]=tmp_adress;
-				}
-
-			}
-
-		}//Label2
-	}//Label1
+    }//Label2
+  }//Label1
 
 
-	//Replica of output array. Important for correct HW synthesis
-	for (i = 0; i < NMB; i++) {
-		list_merger[i]=list_merger_tmp[i];
-		list_adresses[i]=list_adresses_tmp[i];
-	}
+  //Replica of output array. Important for correct HW synthesis
+  for (i = 0; i < NMB; i++) {
+    list_merger[i]=list_merger_tmp[i];
+    list_adresses[i]=list_adresses_tmp[i];
+  }
 
 }
 
@@ -301,19 +301,19 @@ void HGCalStage1SortingAlg_SA::mergerB(data_to_merge_t& list_merger, adress_t& l
 //  Calculate 2^[ceil(log2(NS))-1], which is a loop bound for the sorter algorithm
 //
 //-------------------------------------------------------------------------------------------------/
-int HGCalStage1SortingAlg_SA::loop_bound_for_sorter() const {
+unsigned HGCalStage1SortingAlg_SA::loop_bound_for_sorter() const {
 
-	int res=0;
-	int ns_modified=NS;
+  unsigned res=0;
+  unsigned ns_modified=NS;
 
-	//calculate log2(NS): shift to right until NS == 1 for searching position of MSB
-	while (ns_modified>>=1) { ++res; }
+  //calculate log2(NS): shift to right until NS == 1 for searching position of MSB
+  while (ns_modified>>=1) { ++res; }
 
-	//If 2^[log2(NS)] < NS, round to next integer
-	if (1<<res < NS) { res++; }
+  //If 2^[log2(NS)] < NS, round to next integer
+  if ((unsigned)1<<res < NS) { res++; }
 
-	//return 2^(res-1)
-	return 1<<(res-1);
+  //return 2^(res-1)
+  return (unsigned)1<<(res-1);
 }
 
 
@@ -321,54 +321,54 @@ int HGCalStage1SortingAlg_SA::loop_bound_for_sorter() const {
 //  Calculate 2^[ceil(log2(NM))-1], which is a loop bound for the merger algorithm
 //
 //-------------------------------------------------------------------------------------------------/
-int HGCalStage1SortingAlg_SA::loop_bound_for_mergera() const {
+unsigned HGCalStage1SortingAlg_SA::loop_bound_for_mergera() const {
 
-	int res=0;
-	int nm_modified=NMA;
+  unsigned res=0;
+  unsigned nm_modified=NMA;
 
-	//calculate log2(NM): shift to right until NS == 1 for searching position of MSB
-	while (nm_modified>>=1) { ++res; }
+  //calculate log2(NM): shift to right until NS == 1 for searching position of MSB
+  while (nm_modified>>=1) { ++res; }
 
-	//If 2^[log2(NM)] < NM, round to next integer
-	if (1<<res < NMA) { res++; }
+  //If 2^[log2(NM)] < NM, round to next integer
+  if ((unsigned)1<<res < NMA) { res++; }
 
-	//return 2^(res-1)
-	return 1<<(res-1);
+  //return 2^(res-1)
+  return (unsigned)1<<(res-1);
 }
 
 //-------------------------------------------------------------------------------------------------/
 //  Calculate 2^[ceil(log2(NM))-1], which is a loop bound for the merger algorithm
 //
 //-------------------------------------------------------------------------------------------------/
-int HGCalStage1SortingAlg_SA::loop_bound_for_mergerb() const {
+unsigned HGCalStage1SortingAlg_SA::loop_bound_for_mergerb() const {
 
-	int res=0;
-	int nm_modified=NMB;
+  unsigned res=0;
+  unsigned nm_modified=NMB;
 
-	//calculate log2(NM): shift to right until NS == 1 for searching position of MSB
-	while (nm_modified>>=1) { ++res; }
+  //calculate log2(NM): shift to right until NS == 1 for searching position of MSB
+  while (nm_modified>>=1) { ++res; }
 
-	//If 2^[log2(NM)] < NM, round to next integer
-	if (1<<res < NMB) { res++; }
+  //If 2^[log2(NM)] < NM, round to next integer
+  if ((unsigned)1<<res < NMB) { res++; }
 
-	//return 2^(res-1)
-	return 1<<(res-1);
+  //return 2^(res-1)
+  return (unsigned)1<<(res-1);
 }
 //-------------------------------------------------------------------------------------------------/
 //  Calculate log base 2 of i and round the result to next integer
 //  Equivalent to res=ceil(log(i)/log(2))
 //
 //-------------------------------------------------------------------------------------------------/
-int HGCalStage1SortingAlg_SA::log2_rounded (int i) const {
+unsigned HGCalStage1SortingAlg_SA::log2_rounded (unsigned i) const {
 
-	int res=0;
-	int tmp=i;
+  unsigned res=0;
+  unsigned tmp=i;
 
-	//Shift to right untill i == 1 for searching position of MSB
-	while (i>>=1) { ++res; }
+  //Shift to right untill i == 1 for searching position of MSB
+  while (i>>=1) { ++res; }
 
-	//If 2^res < i, round
-	if (1<<res < tmp) { res++; }
+  //If 2^res < i, round
+  if ((unsigned)1<<res < tmp) { res++; }
 
-	return res;
+  return res;
 }
