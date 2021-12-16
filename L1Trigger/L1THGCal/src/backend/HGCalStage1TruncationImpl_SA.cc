@@ -1,11 +1,14 @@
 #include "L1Trigger/L1THGCal/interface/backend/HGCalStage1TruncationImpl_SA.h"
 #include <cmath>
 
+#include <iostream>
+
 HGCalStage1TruncationImplSA::HGCalStage1TruncationImplSA() {}
 
 unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-                                          const l1thgcfirmware::Stage1TruncationConfig& theConf,
+                                          const Stage1TruncationConfig& theConf,
                                           l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const {
+  std::cout << "in wrong implementation" << std::endl;
   unsigned sector120 = theConf.phiSector();
   std::unordered_map<unsigned, l1thgcfirmware::HGCalTriggerCellSACollection> tcs_per_bin;
 

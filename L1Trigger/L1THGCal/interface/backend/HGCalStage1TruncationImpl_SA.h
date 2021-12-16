@@ -17,7 +17,7 @@ public:
   void runAlgorithm() const;
 
   unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-               const l1thgcfirmware::Stage1TruncationConfig& theConf,
+               const Stage1TruncationConfig& theConf,
                l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
 
 private:
