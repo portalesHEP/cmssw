@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>  // uint32_t
 
-namespace l1thgcfirmware {
+namespace l1thgcfirmwareDUMMY {
 
   class Stage1TruncationConfig {
   public:

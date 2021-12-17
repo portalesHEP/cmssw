@@ -1,162 +1,49 @@
-#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationImpl_SA.h"
-#include <cmath>
-#include <iostream>
+#ifndef __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
+#define __L1Trigger_L1THGCal_HGCalStage1TruncationImpl_SA_h__
 
-using namespace l1thgcfirmware;
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalTriggerCell_SA.h"
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationConfig_SA.h"
+#include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1SortingAlg_SA.h"
 
-HGCalStage1TruncationImplEmulator::HGCalStage1TruncationImplEmulator() {}
+#include <vector>
+#include <cstdint>        // uint32_t, unsigned
+#include <unordered_map>  // std::unordered_map
 
-unsigned HGCalStage1TruncationImplEmulator::run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-                                          const l1thgcfirmware::Stage1TruncationConfig& theConf,
-                                          l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const {
-  unsigned sector120 = theConf.phiSector();
-  std::unordered_map<unsigned, l1thgcfirmware::HGCalTriggerCellSACollection> tcs_per_bin;
+namespace l1thgcfirmware {
 
-  // configuation:
-  bool do_truncate = theConf.doTruncate();
-  double rozmin = theConf.rozMin() * 4096/ 0.7; // "magic numbers" needed for s1 input format
-  double rozmax = theConf.rozMax() * 4096/ 0.7; // "magic numbers" needed for s1 input format
-  unsigned rozbins = theConf.rozBins();
-  const std::vector<unsigned>& maxtcsperbin = theConf.maxTcsPerBin();
-  const std::vector<double>& phiedges = theConf.phiEdges();
+  class HGCalStage1TruncationImplSA {
+  public:
+    HGCalStage1TruncationImplSA();
+    ~HGCalStage1TruncationImplSA() {}
 
-  constexpr double margin = 1.001;
-  double roz_bin_size = (rozbins > 0 ? (rozmax - rozmin) * margin / double(rozbins) : 0.);
+    void runAlgorithm() const;
 
-  // group TCs per (r/z, phi) bins
-  for (const auto& tc : tcs_in) {
-    double roverz = tc.rOverZ();
-    roverz = (roverz < rozmin ? rozmin : roverz);
-    roverz = (roverz > rozmax ? rozmax : roverz);
+    unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
+		 const l1thgcfirmware::Stage1TruncationConfig& theConf,
+		 l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
 
-    unsigned roverzbin = (roz_bin_size > 0. ? unsigned((roverz - rozmin) / roz_bin_size) : 0);
-    double phi = rotatedphi(tc.phi(), sector120); // needed?
-    int phibin = phiBin(roverzbin, phi, phiedges);
-    if (phibin < 0)
-      return 1;
-    uint32_t packed_bin = packBin(roverzbin, phibin);
+  private:
+    static constexpr unsigned offset_roz_ = 1;
+    static constexpr unsigned mask_roz_ = 0x3f;  // 6 bits, max 64 bins
+    static constexpr unsigned mask_phi_ = 1;
 
-    tcs_per_bin[packed_bin].push_back(tc);
-  }
+    bool do_truncate_;
+    double roz_min_ = 0.;
+    double roz_max_ = 0.;
+    unsigned roz_bins_ = 42;
+    std::vector<unsigned> max_tcs_per_bin_;
+    std::vector<double> phi_edges_;
 
-  /***************************************
-   * default cmssw sorting/truncation    *
-   * -> kept until cmssw version updated *
-   ***************************************/
-  // apply sorting and trunction in each (r/z, phi) bin
-//  for (auto& bin_tcs : tcs_per_bin) {
-//    std::sort(bin_tcs.second.begin(),
-//              bin_tcs.second.end(),
-//              [](const l1thgcfirmware::HGCalTriggerCell& a, const l1thgcfirmware::HGCalTriggerCell& b) -> bool {
-//                //return a.mipPt() > b.mipPt(); // not available in Emyr's definition of HGCalTriggerCell_SA objects
-//                return a.energy() > b.energy(); // replacing by energy for now, filled with mipT
-//              });
-//
-//    unsigned roverzbin = 0;
-//    unsigned phibin = 0;
-//    unpackBin(bin_tcs.first, roverzbin, phibin);
-//    if (roverzbin >= maxtcsperbin.size())
-//      return 1;
-//
-//    unsigned max_tc = maxtcsperbin[roverzbin];
-//    if (do_truncate && bin_tcs.second.size() > max_tc) {
-//      bin_tcs.second.resize(max_tc);
-//    }
-//
-//    for (const auto& tc : bin_tcs.second) {
-//      tcs_out.push_back(tc);
-//    }
-//  }
+    uint32_t packBin(unsigned roverzbin, unsigned phibin) const;
+    void unpackBin(unsigned packedbin, unsigned& roverzbin, unsigned& phibin) const;
+    int phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const;
+    double rotatedphi(double x, double y, double z, unsigned sector) const;
+    double rotatedphi(double phi, unsigned sector) const;
 
-  /**********************************
-   * emulated FW sorting/truncation *
-   **********************************/
-  for (auto& bin_tcs : tcs_per_bin) {
+    unsigned smallerMultOfFourGreaterThan(unsigned n) const;
 
-    unsigned roverzbin = 0;
-    int phibin = 0;
-    unpackBin(bin_tcs.first, roverzbin, phibin);
+  };
 
-//    const unsigned ntcin = smallerMultOfFourGreaterThan(bin_tcs.second.at(0).ntc());
-    const unsigned ntcin = smallerMultOfFourGreaterThan(bin_tcs.second.size());
-    const unsigned ntcout = maxtcsperbin[roverzbin];
+} // lithgcfirmware
 
-    l1thgcfirmware::HGCalStage1SortingAlg_SA tcSorter(ntcin,ntcout);
-
-    std::vector<unsigned> theTCsIn_mipt(ntcin);
-    std::vector<unsigned> theTCsOut_mipt(ntcout);
-    std::vector<unsigned> theTCsOut_addr(ntcout);
-    for (unsigned i=0; i<ntcin; ++i) {
-      if(i<bin_tcs.second.size())
-        theTCsIn_mipt[i] = bin_tcs.second.at(i).energy();
-      else
-        theTCsIn_mipt[i] = 0;
-    }
-    tcSorter.sorting(theTCsIn_mipt, theTCsOut_mipt, theTCsOut_addr);
-
-    for (const unsigned& tcid : theTCsOut_addr) {
-      if(tcid<bin_tcs.second.size())
-        tcs_out.push_back(bin_tcs.second.at(tcid));
-    }
-  }
-
-  return 0;
-}
-
-uint32_t HGCalStage1TruncationImplEmulator::packBin(unsigned roverzbin, int phibin) const {
-  unsigned packed_bin = 0;
-  packed_bin |= ((roverzbin & mask_roz_) << offset_roz_);
-  packed_bin |= (phibin & mask_phi_);
-  return packed_bin;
-}
-
-void HGCalStage1TruncationImplEmulator::unpackBin(unsigned packedbin, unsigned& roverzbin, int& phibin) const {
-  roverzbin = ((packedbin >> offset_roz_) & mask_roz_);
-  phibin = (packedbin & mask_phi_);
-}
-
-int HGCalStage1TruncationImplEmulator::phiBin(unsigned roverzbin, double phi, const std::vector<double>& phiedges) const {
-  unsigned phi_bin = 0;
-  if (roverzbin >= phiedges.size())
-    return -1;
-  double phi_edge = phiedges[roverzbin];
-  if (phi > phi_edge)
-    phi_bin = 1;
-  return phi_bin;
-}
-
-double HGCalStage1TruncationImplEmulator::rotatedphi(double x, double y, double z, unsigned sector) const {
-  if (z > 0)
-    x = -x;
-  double phi = std::atan2(y, x);
-
-  if (sector == 1) {
-    if (phi < M_PI and phi > 0)
-      phi = phi - (2. * M_PI / 3.);
-    else
-      phi = phi + (4. * M_PI / 3.);
-  } else if (sector == 2) {
-    phi = phi + (2. * M_PI / 3.);
-  }
-  return phi;
-}
-
-double HGCalStage1TruncationImplEmulator::rotatedphi(double phi, unsigned sector) const {
-  if (sector == 1) {
-    if (phi < M_PI and phi > 0)
-      phi = phi - (2. * M_PI / 3.);
-    else
-      phi = phi + (4. * M_PI / 3.);
-  } else if (sector == 2) {
-    phi = phi + (2. * M_PI / 3.);
-  }
-  return phi;
-}
-
-  unsigned HGCalStage1TruncationImplEmulator::smallerMultOfFourGreaterThan(unsigned N) const {
-    unsigned remnant = (N+4)%4;
-    if (remnant==0)
-      return N;
-    else
-      return (N+4-remnant);
-  }
+#endif

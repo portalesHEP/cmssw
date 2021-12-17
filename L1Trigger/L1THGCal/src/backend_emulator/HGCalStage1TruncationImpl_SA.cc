@@ -35,7 +35,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
     int phibin = phiBin(roverzbin, phi, phiedges);
     if (phibin < 0)
       return 1;
-    uint32_t packed_bin = packBin(roverzbin, phibin);
+    unsigned packed_bin = packBin(roverzbin, phibin);
 
       tcs_per_bin[packed_bin].push_back(tc);
   }
@@ -75,7 +75,7 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmware::HGCalTriggerCell
   return 0;
 }
 
-unsigned HGCalStage1TruncationImplSA::packBin(unsigned roverzbin, unsigned phibin) const {
+uint32_t HGCalStage1TruncationImplSA::packBin(unsigned roverzbin, unsigned phibin) const {
   unsigned packed_bin = 0;
   packed_bin |= ((roverzbin & mask_roz_) << offset_roz_);
   packed_bin |= (phibin & mask_phi_);
