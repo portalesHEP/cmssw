@@ -16,9 +16,9 @@ public:
 
   void runAlgorithm() const;
 
-  unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-               const l1thgcfirmware::Stage1TruncationConfig& theConf,
-               l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
+  unsigned run(const l1thgcfirmwareDUMMY::HGCalTriggerCellSACollection& tcs_in,
+               const Stage1TruncationConfig& theConf,
+               l1thgcfirmwareDUMMY::HGCalTriggerCellSACollection& tcs_out) const;
 
 private:
   static constexpr unsigned offset_roz_ = 1;
