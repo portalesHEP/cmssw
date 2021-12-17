@@ -67,6 +67,6 @@ namespace l1thgcfirmwareDUMMY {
     uint32_t fpga_id_;
   };
 
-}  // namespace l1thgcfirmware
+}  // namespace l1thgcfirmwareDUMMY
 
 #endif

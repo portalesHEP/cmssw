@@ -42,9 +42,8 @@ unsigned HGCalStage1TruncationImplSA::run(const l1thgcfirmwareDUMMY::HGCalTrigge
   for (auto& bin_tcs : tcs_per_bin) {
     std::sort(bin_tcs.second.begin(),
               bin_tcs.second.end(),
-              [](const l1thgcfirmwareDUMMY::HGCalTriggerCell& a, const l1thgcfirmwareDUMMY::HGCalTriggerCell& b) -> bool {
-                return a.mipPt() > b.mipPt();
-              });
+              [](const l1thgcfirmwareDUMMY::HGCalTriggerCell& a,
+                 const l1thgcfirmwareDUMMY::HGCalTriggerCell& b) -> bool { return a.mipPt() > b.mipPt(); });
 
     unsigned roverzbin = 0;
     unsigned phibin = 0;

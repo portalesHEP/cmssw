@@ -11,12 +11,12 @@ namespace l1thgcfirmware {
   public:
     HGCalTriggerCell() : HGCalTriggerCell(false, false, 0, 0, 0, 0, 0) {}
     HGCalTriggerCell(bool frameValid,
-                 bool dataValid,
-                 unsigned int rOverZ,
-                 unsigned int phi,
-                 unsigned int layer,
-                 unsigned int energy,
-                 unsigned int idx_cmssw)
+                     bool dataValid,
+                     unsigned int rOverZ,
+                     unsigned int phi,
+                     unsigned int layer,
+                     unsigned int energy,
+                     unsigned int idx_cmssw)
         : clock_(0),
           index_(0),
           rOverZ_(rOverZ),
@@ -31,16 +31,16 @@ namespace l1thgcfirmware {
           dataValid_(dataValid),
           index_cmssw_(idx_cmssw) {}
 
-    ~HGCalTriggerCell(){}
+    ~HGCalTriggerCell() {}
 
     // Setters
-    void setClock( const unsigned int clock ) { clock_ = clock; }
-    void addLatency( const unsigned int latency ) { clock_ += latency; }
-    void setIndex( const unsigned int index ) { index_ = index; }
-    void setSortKey( const unsigned int sortKey ) { sortKey_ = sortKey; }
-    void setDX( const int dX ) { dX_ = dX; }
-    void setY( const unsigned int Y ) { Y_ = Y; }
-    void setDeltaR2( const unsigned int deltaR2 ) { deltaR2_ = deltaR2; }
+    void setClock(const unsigned int clock) { clock_ = clock; }
+    void addLatency(const unsigned int latency) { clock_ += latency; }
+    void setIndex(const unsigned int index) { index_ = index; }
+    void setSortKey(const unsigned int sortKey) { sortKey_ = sortKey; }
+    void setDX(const int dX) { dX_ = dX; }
+    void setY(const unsigned int Y) { Y_ = Y; }
+    void setDeltaR2(const unsigned int deltaR2) { deltaR2_ = deltaR2; }
 
     // Getters
     unsigned int clock() const { return clock_; }
@@ -75,14 +75,13 @@ namespace l1thgcfirmware {
     bool frameValid_;
     bool dataValid_;
     unsigned int index_cmssw_;
-
   };
 
   typedef std::vector<HGCalTriggerCell> HGCalTriggerCellSACollection;
   typedef std::shared_ptr<HGCalTriggerCell> HGCalTriggerCellSAPtr;
   typedef std::vector<HGCalTriggerCellSAPtr> HGCalTriggerCellSAPtrCollection;
-  typedef std::vector< std::vector<std::shared_ptr<HGCalTriggerCell> > > HGCalTriggerCellSAPtrCollections;
-  typedef std::vector< std::vector< std::vector<std::shared_ptr<HGCalTriggerCell> > > > HGCalTriggerCellSAPtrCollectionss;
+  typedef std::vector<std::vector<std::shared_ptr<HGCalTriggerCell> > > HGCalTriggerCellSAPtrCollections;
+  typedef std::vector<std::vector<std::vector<std::shared_ptr<HGCalTriggerCell> > > > HGCalTriggerCellSAPtrCollectionss;
 }  // namespace l1thgcfirmware
 
 #endif

@@ -19,8 +19,8 @@ namespace l1thgcfirmware {
     void runAlgorithm() const;
 
     unsigned run(const l1thgcfirmware::HGCalTriggerCellSACollection& tcs_in,
-		 const l1thgcfirmware::Stage1TruncationConfig& theConf,
-		 l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
+                 const l1thgcfirmware::Stage1TruncationConfig& theConf,
+                 l1thgcfirmware::HGCalTriggerCellSACollection& tcs_out) const;
 
   private:
     static constexpr unsigned offset_roz_ = 1;
@@ -41,9 +41,8 @@ namespace l1thgcfirmware {
     double rotatedphi(double phi, unsigned sector) const;
 
     unsigned smallerMultOfFourGreaterThan(unsigned n) const;
-
   };
 
-} // lithgcfirmware
+}  // namespace l1thgcfirmware
 
 #endif
