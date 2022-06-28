@@ -85,12 +85,14 @@ double HGCalStage1TruncationImplSA::rotatedphi(double x, double y, double z, int
     x = -x;
   double phi = std::atan2(y, x);
 
-  if (sector == 1) {
+//  if (sector == 1) {
+  if (sector == 0) {
     if (phi < M_PI and phi > 0)
       phi = phi - (2. * M_PI / 3.);
     else
       phi = phi + (4. * M_PI / 3.);
-  } else if (sector == 2) {
+//  } else if (sector == 2) {
+  } else if (sector == 1) {
     phi = phi + (2. * M_PI / 3.);
   }
   return phi;
