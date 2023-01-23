@@ -4,10 +4,11 @@
 #include "DataFormats/ForwardDetId/interface/HGCalDetId.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
 #include "DataFormats/ForwardDetId/interface/HGCalTriggerDetId.h"
+#include "DataFormats/ForwardDetId/interface/HGCalTriggerModuleDetId.h"
 #include "L1Trigger/L1THGCal/interface/HGCalTriggerGeometryBase.h"
 #include "L1Trigger/L1THGCalUtilities/interface/HGCalTriggerNtupleBase.h"
 #include "L1Trigger/L1THGCal/interface/HGCalTriggerTools.h"
-
+#include <bitset>
 class HGCalTriggerNtupleHGCTriggerSums : public HGCalTriggerNtupleBase {
 public:
   HGCalTriggerNtupleHGCTriggerSums(const edm::ParameterSet& conf);
@@ -29,7 +30,8 @@ private:
   std::vector<int> ts_layer_;
   std::vector<int> ts_panel_number_;
   std::vector<int> ts_panel_sector_;
-  std::vector<int> ts_wafer_;
+  std::vector<int> ts_waferu_;
+  std::vector<int> ts_waferv_;
   std::vector<int> ts_wafertype_;
   std::vector<uint32_t> ts_data_;
   std::vector<float> ts_mipPt_;
@@ -68,7 +70,8 @@ void HGCalTriggerNtupleHGCTriggerSums::initialize(TTree& tree,
   tree.Branch(withPrefix("subdet"), &ts_subdet_);
   tree.Branch(withPrefix("zside"), &ts_side_);
   tree.Branch(withPrefix("layer"), &ts_layer_);
-  tree.Branch(withPrefix("wafer"), &ts_wafer_);
+  tree.Branch(withPrefix("waferu"), &ts_waferu_);
+  tree.Branch(withPrefix("waferv"), &ts_waferv_);
   tree.Branch(withPrefix("wafertype"), &ts_wafertype_);
   tree.Branch(withPrefix("data"), &ts_data_);
   tree.Branch(withPrefix("pt"), &ts_pt_);
@@ -98,16 +101,28 @@ void HGCalTriggerNtupleHGCTriggerSums::fill(const edm::Event& e, const HGCalTrig
       ts_id_.emplace_back(ts_itr->detId());
       ts_side_.emplace_back(triggerTools_.zside(moduleId));
       ts_layer_.emplace_back(triggerTools_.layerWithOffset(moduleId));
-      if (moduleId.det() == DetId::HGCalTrigger) {
+      if (moduleId.subdetId() == ForwardSubdetector::HGCTrigger) {
+        HGCalTriggerModuleDetId id(moduleId);
+        ts_subdet_.emplace_back(id.subdetId());
+        ts_waferu_.emplace_back(id.moduleU());
+        ts_waferv_.emplace_back(id.moduleV());
+        ts_wafertype_.emplace_back(id.type());
+      } else if (moduleId.det() == DetId::HGCalTrigger) {
         HGCalTriggerDetId id(moduleId);
         ts_subdet_.emplace_back(id.subdet());
+        ts_waferu_.emplace_back(id.waferU());
+        ts_waferv_.emplace_back(id.waferV());
         ts_wafertype_.emplace_back(id.type());
       } else if (moduleId.det() == DetId::HGCalHSc) {
         HGCScintillatorDetId id(moduleId);
         ts_subdet_.emplace_back(id.subdet());
+        ts_waferu_.emplace_back(-999);
+        ts_waferv_.emplace_back(-999);
         ts_wafertype_.emplace_back(id.type());
       } else {
         ts_subdet_.emplace_back(-999);
+        ts_waferu_.emplace_back(-999);
+        ts_waferv_.emplace_back(-999);
         ts_wafertype_.emplace_back(-999);
       }
       ts_data_.emplace_back(ts_itr->hwPt());
@@ -120,6 +135,7 @@ void HGCalTriggerNtupleHGCTriggerSums::fill(const edm::Event& e, const HGCalTrig
       ts_x_.emplace_back(ts_itr->position().x());
       ts_y_.emplace_back(ts_itr->position().y());
       ts_z_.emplace_back(ts_itr->position().z());
+
     }
   }
 }
@@ -130,7 +146,8 @@ void HGCalTriggerNtupleHGCTriggerSums::clear() {
   ts_subdet_.clear();
   ts_side_.clear();
   ts_layer_.clear();
-  ts_wafer_.clear();
+  ts_waferu_.clear();
+  ts_waferv_.clear();
   ts_wafertype_.clear();
   ts_data_.clear();
   ts_mipPt_.clear();
