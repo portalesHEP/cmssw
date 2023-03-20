@@ -1,5 +1,6 @@
 
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/HGCalCommonData/interface/HGCalGeomRotation.h"
 #include "DataFormats/L1THGCal/interface/HGCalTriggerSums.h"
 #include "DataFormats/ForwardDetId/interface/HGCalDetId.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
@@ -8,6 +9,7 @@
 #include "L1Trigger/L1THGCal/interface/HGCalTriggerGeometryBase.h"
 #include "L1Trigger/L1THGCalUtilities/interface/HGCalTriggerNtupleBase.h"
 #include "L1Trigger/L1THGCal/interface/HGCalTriggerTools.h"
+
 #include <bitset>
 class HGCalTriggerNtupleHGCTriggerSums : public HGCalTriggerNtupleBase {
 public:
@@ -103,21 +105,14 @@ void HGCalTriggerNtupleHGCTriggerSums::fill(const edm::Event& e, const HGCalTrig
       ts_layer_.emplace_back(triggerTools_.layerWithOffset(moduleId));
       if (moduleId.subdetId() == ForwardSubdetector::HGCTrigger) {
         HGCalTriggerModuleDetId id(moduleId);
-        ts_subdet_.emplace_back(id.subdetId());
-        ts_waferu_.emplace_back(id.moduleU());
-        ts_waferv_.emplace_back(id.moduleV());
-        ts_wafertype_.emplace_back(id.type());
-      } else if (moduleId.det() == DetId::HGCalTrigger) {
-        HGCalTriggerDetId id(moduleId);
-        ts_subdet_.emplace_back(id.subdet());
-        ts_waferu_.emplace_back(id.waferU());
-        ts_waferv_.emplace_back(id.waferV());
-        ts_wafertype_.emplace_back(id.type());
-      } else if (moduleId.det() == DetId::HGCalHSc) {
-        HGCScintillatorDetId id(moduleId);
-        ts_subdet_.emplace_back(id.subdet());
-        ts_waferu_.emplace_back(-999);
-        ts_waferv_.emplace_back(-999);
+	int sector = id.sector();
+	int modU = id.moduleU();
+	int modV = id.moduleV();
+	HGCalGeomRotation rotation(HGCalGeomRotation::SectorType::Sector120Degrees);
+	rotation.uvMappingFromSector0(HGCalGeomRotation::WaferCentring::WaferCentred, modU,modV, sector);
+        ts_subdet_.emplace_back(id.triggerSubdetId());
+        ts_waferu_.emplace_back(modU);
+        ts_waferv_.emplace_back(modV);
         ts_wafertype_.emplace_back(id.type());
       } else {
         ts_subdet_.emplace_back(-999);
